@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -59,6 +60,14 @@ public class User implements UserDetails, Principal {
         return email;
     }
 
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
+//    public Objects fullName() {
+//        return getFirstName() + " " + getLastName();
+//    }
+
 
     @Override
     public String getPassword() {
@@ -80,7 +89,7 @@ public class User implements UserDetails, Principal {
 
     @Override
     public boolean isAccountNonLocked() {
-        return !accountLocked;
+        return true;
     }
 
 
@@ -92,6 +101,6 @@ public class User implements UserDetails, Principal {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return true;
     }
 }

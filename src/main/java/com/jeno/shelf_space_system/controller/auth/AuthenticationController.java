@@ -1,5 +1,7 @@
 package com.jeno.shelf_space_system.controller.auth;
 
+import com.jeno.shelf_space_system.dto.auth.AuthenticationRequest;
+import com.jeno.shelf_space_system.dto.auth.AuthenticationResponse;
 import com.jeno.shelf_space_system.dto.auth.RegistrationRequest;
 import com.jeno.shelf_space_system.service.auth.AuthenticationService;
 import jakarta.validation.Valid;
@@ -21,6 +23,13 @@ public class AuthenticationController {
     public ResponseEntity<?> registerUser(@RequestBody @Valid RegistrationRequest registrationRequest) {
         authenticationService.registerUser(registrationRequest);
         return ResponseEntity.accepted().build();
+    }
+
+    //Authenticate user
+    @PostMapping("/authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticateUser(
+            @RequestBody @Valid AuthenticationRequest request) {
+        return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
 
