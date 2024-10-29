@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -64,9 +63,9 @@ public class User implements UserDetails, Principal {
         return firstName + " " + lastName;
     }
 
-//    public Objects fullName() {
-//        return getFirstName() + " " + getLastName();
-//    }
+    public String fullName() {
+        return getFirstName() + " " + getLastName();
+    }
 
 
     @Override
