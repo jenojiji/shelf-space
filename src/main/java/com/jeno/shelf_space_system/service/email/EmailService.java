@@ -3,6 +3,7 @@ package com.jeno.shelf_space_system.service.email;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class EmailService {
 
+    @Autowired
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
 
@@ -35,7 +37,7 @@ public class EmailService {
         if (emailTemplate == null) {
             templateName = "confirm_email";
         } else {
-            templateName = emailTemplate.name();
+            templateName = emailTemplate.getName();
         }
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -53,7 +55,7 @@ public class EmailService {
         Context context = new Context();
         context.setVariables(properties);
 
-        messageHelper.setFrom("jeno@gmail.com");
+        messageHelper.setFrom("jenoattickal013@gmail.com");
         messageHelper.setTo(to);
         messageHelper.setSubject(subject);
 
@@ -64,6 +66,14 @@ public class EmailService {
 
 
     }
+
+    /**
+     * for running maildev(local mail testing tool
+     * terminal scripts:
+     * sudo systemctl start docker
+     * sudo systemctl enable docker
+     * sudo docker run -d -p 1025:1025 -p 1080:1080 maildev/maildev
+     */
 
 
 }
