@@ -1,5 +1,6 @@
 package com.jeno.shelf_space_system.model.user;
 
+import com.jeno.shelf_space_system.model.book.Book;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -41,6 +42,9 @@ public class User implements UserDetails, Principal {
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Book> books;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
