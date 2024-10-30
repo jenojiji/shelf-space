@@ -9,10 +9,15 @@ import com.jeno.shelf_space_system.repository.RoleRepository;
 import com.jeno.shelf_space_system.repository.TokenRepository;
 import com.jeno.shelf_space_system.repository.UserRepository;
 import com.jeno.shelf_space_system.security.JwtService;
+import com.jeno.shelf_space_system.service.email.EmailService;
+import com.jeno.shelf_space_system.service.email.EmailTemplateName;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +25,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +36,12 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
+    private final EmailService emailService;
 
-    public void registerUser(RegistrationRequest request) {
+    @Value("${application.mailing.frontend.activation-url}")
+    String activationUrl;
+
+    public void registerUser(RegistrationRequest request) throws MessagingException {
 
         var userRole = roleRepository.findByName("USER")
                 //to-do:better exception handling
@@ -53,9 +62,17 @@ public class AuthenticationService {
 
     }
 
-    private void sendValidationEmail(User user) {
+    private void sendValidationEmail(User user) throws MessagingException {
         var newToken = generateAndSaveActivationToken(user);
         //send email
+        emailService.sendEmail(
+                user.getEmail(),
+                user.fullName(),
+                EmailTemplateName.ACTIVATE_ACCOUNT,
+                activationUrl,
+                newToken,
+                "Account Activation"
+        );
     }
 
     private String generateAndSaveActivationToken(User user) {
@@ -96,9 +113,23 @@ public class AuthenticationService {
         );
         var claims = new HashMap<String, Object>();
         var user = ((User) auth.getPrincipal());
-        claims.put("fullName",user.fullName());
+        claims.put("fullName", user.fullName());
         var jwtToken = jwtService.generateToken(claims, user);
         return AuthenticationResponse.builder().token(jwtToken).build();
+    }
 
+    public void activate(String activationToken) throws MessagingException {
+        Token savedToken=tokenRepository.findByToken(activationToken)
+                .orElseThrow(()->new RuntimeException("Token not found"));
+        if (LocalDateTime.now().isAfter(savedToken.getExpiresAt())){
+            sendValidationEmail(savedToken.getUser());
+            throw new RuntimeException("Activation Token has expired.New token is sent to the same email.");
+        }
+        var user=userRepository.findById(savedToken.getUser().getId())
+                .orElseThrow(()->new UsernameNotFoundException("User not found"));
+        user.setEnabled(true);
+        userRepository.save(user);
+        savedToken.setValidatedAt(LocalDateTime.now());
+        tokenRepository.save(savedToken);
     }
 }
