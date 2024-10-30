@@ -73,6 +73,7 @@ public class EmailService {
      * sudo systemctl start docker
      * sudo systemctl enable docker
      * sudo docker run -d -p 1025:1025 -p 1080:1080 maildev/maildev
+     * url : http://localhost:1080/#/
      */
 
 
