@@ -3,6 +3,7 @@ package com.jeno.shelf_space_system.dto.book;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+
 public record BookRequest(
         Integer id,
         @NotNull(message = "100")
