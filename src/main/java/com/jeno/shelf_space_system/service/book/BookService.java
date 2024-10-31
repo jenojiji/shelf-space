@@ -146,4 +146,30 @@ public class BookService {
         bookRepository.save(book);
         return book.getId();
     }
+
+    public Integer borrowBook(Integer bookId, Authentication connectedUser) throws OperationNotSupportedException {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("Book not found"));
+        if (book.isArchived() || !book.isShareable()) {
+            throw new OperationNotSupportedException("You are not permitted to borrow this book");
+        }
+        User user = ((User) connectedUser.getPrincipal());
+        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotSupportedException("You are not borrow your own book");
+        }
+        final boolean isAlreadyBorrowedByOtherUser = bookTransactionHistoryRepository.isAlreadyBorrowedByUser(bookId, user.getName());
+        if (isAlreadyBorrowedByOtherUser) {
+            throw new OperationNotSupportedException("Te requested book is already borrowed");
+        }
+
+        BookTransactionHistory bookTransactionHistory = BookTransactionHistory.builder()
+                .userId(connectedUser.getName())
+                .book(book)
+                .returned(false)
+                .returnApproved(false)
+                .build();
+        return bookTransactionHistoryRepository.save(bookTransactionHistory).getId();
+
+
+    }
 }
