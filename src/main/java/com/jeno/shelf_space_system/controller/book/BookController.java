@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.OperationNotSupportedException;
+
 @RestController
 @RequestMapping("books")
 @RequiredArgsConstructor
@@ -66,5 +68,29 @@ public class BookController {
             Authentication connectedUser
     ) {
         return ResponseEntity.ok(bookService.findAllReturnedBooks(page, size, connectedUser));
+    }
+
+    @PatchMapping("/shareable/{book_id}")
+    public ResponseEntity<Integer> updateShareableStatus(
+            @PathVariable("book-id") Integer bookId,
+            Authentication connectedUser
+    ) throws OperationNotSupportedException {
+        return ResponseEntity.ok(bookService.updateShareableStatus(bookId, connectedUser));
+    }
+
+    @PatchMapping("/shareable/{book_id}")
+    public ResponseEntity<Integer> updateArchivedStatus(
+            @PathVariable("book-id") Integer bookId,
+            Authentication connectedUser
+    ) throws OperationNotSupportedException {
+        return ResponseEntity.ok(bookService.updateArchivedStatus(bookId, connectedUser));
+    }
+
+    @PostMapping("borrow/{book-id}")
+    public ResponseEntity<Integer> borrowBook(
+            @PathVariable("book-id") Integer bookId,
+            Authentication connectedUser
+    ) throws OperationNotSupportedException {
+        return ResponseEntity.ok(bookService.borrowBook(bookId, connectedUser));
     }
 }
