@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -108,6 +109,18 @@ public class BookController {
             Authentication connectedUser
     ) throws OperationNotSupportedException {
         return ResponseEntity.ok(bookService.approveReturnedBook(bookId, connectedUser));
+    }
+
+
+    @PostMapping(value = "/cover/book/{book_id}",consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadBookCoverPicture(
+            @PathVariable("book_id") Integer bookId,
+            @RequestPart("file")MultipartFile file,
+            Authentication connectedUser
+            ){
+        bookService.uploadBookCoverPicture(file,connectedUser,bookId);
+        return ResponseEntity.accepted().build();
+
     }
 
 
