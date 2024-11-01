@@ -10,6 +10,7 @@ import com.jeno.shelf_space_system.model.book.BookTransactionHistory;
 import com.jeno.shelf_space_system.model.user.User;
 import com.jeno.shelf_space_system.repository.BookRepository;
 import com.jeno.shelf_space_system.repository.BookTransactionHistoryRepository;
+import com.jeno.shelf_space_system.service.file.FilestorageService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.naming.OperationNotSupportedException;
 import java.util.List;
@@ -33,6 +35,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final BookTransactionHistoryRepository bookTransactionHistoryRepository;
+    private final FilestorageService filestorageService;
 
     public Integer saveBook(@Valid BookRequest request, Authentication connectedUser) {
         User user = ((User) connectedUser.getPrincipal());
@@ -204,5 +207,14 @@ public class BookService {
                 .orElseThrow(() -> new OperationNotSupportedException("This book is not returned to get approved"));
         bookTransactionHistory.setReturnApproved(true);
         return bookTransactionHistoryRepository.save(bookTransactionHistory).getId();
+    }
+
+    public void uploadBookCoverPicture(MultipartFile file, Authentication connectedUser, Integer bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("Book not found"));
+        User user = ((User) connectedUser.getPrincipal());
+        var bookCover = filestorageService.saveFile(file, user.getId());
+        book.setBookCover(bookCover);
+        bookRepository.save(book);
     }
 }
