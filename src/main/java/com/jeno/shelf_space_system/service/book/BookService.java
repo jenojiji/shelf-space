@@ -155,7 +155,7 @@ public class BookService {
         }
         User user = ((User) connectedUser.getPrincipal());
         if (!Objects.equals(book.getOwner().getId(), user.getId())) {
-            throw new OperationNotSupportedException("You are not borrow your own book");
+            throw new OperationNotSupportedException("You cannot borrow your own book");
         }
         final boolean isAlreadyBorrowedByOtherUser = bookTransactionHistoryRepository.isAlreadyBorrowedByUser(bookId, user.getName());
         if (isAlreadyBorrowedByOtherUser) {
@@ -171,5 +171,38 @@ public class BookService {
         return bookTransactionHistoryRepository.save(bookTransactionHistory).getId();
 
 
+    }
+
+    public Integer returnBook(Integer bookId, Authentication connectedUser) throws OperationNotSupportedException {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("Book not found"));
+        if (book.isArchived() || !book.isShareable()) {
+            throw new OperationNotSupportedException("You are not permitted to return this book");
+        }
+        User user = ((User) connectedUser.getPrincipal());
+        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotSupportedException("You cannot return your own book");
+        }
+        BookTransactionHistory bookTransactionHistory = bookTransactionHistoryRepository.findBookByBookIdAndUserId(bookId, user.getId())
+                .orElseThrow(() -> new OperationNotSupportedException("You didn't borrow this book"));
+        bookTransactionHistory.setReturned(true);
+        return bookTransactionHistoryRepository.save(bookTransactionHistory).getId();
+
+    }
+
+    public Integer approveReturnedBook(Integer bookId, Authentication connectedUser) throws OperationNotSupportedException {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("Book not found"));
+        if (book.isArchived() || !book.isShareable()) {
+            throw new OperationNotSupportedException("You are not permitted to return this book");
+        }
+        User user = ((User) connectedUser.getPrincipal());
+        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotSupportedException("You cannot return your own book");
+        }
+        BookTransactionHistory bookTransactionHistory = bookTransactionHistoryRepository.findBookByBookIdAndOwnerId(bookId, user.getId())
+                .orElseThrow(() -> new OperationNotSupportedException("This book is not returned to get approved"));
+        bookTransactionHistory.setReturnApproved(true);
+        return bookTransactionHistoryRepository.save(bookTransactionHistory).getId();
     }
 }
