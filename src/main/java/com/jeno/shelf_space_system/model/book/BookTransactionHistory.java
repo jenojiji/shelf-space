@@ -2,6 +2,7 @@ package com.jeno.shelf_space_system.model.book;
 
 import com.jeno.shelf_space_system.model.common.BaseEntity;
 import com.jeno.shelf_space_system.model.user.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -19,8 +20,9 @@ import lombok.experimental.SuperBuilder;
 @Entity
 public class BookTransactionHistory extends BaseEntity {
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+    @Column(name = "user_id")
     private String userId;
     @ManyToOne
     @JoinColumn(name = "book_id")
