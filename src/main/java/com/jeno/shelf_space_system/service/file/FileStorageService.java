@@ -16,10 +16,10 @@ import java.nio.file.Paths;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class FilestorageService {
+public class FileStorageService {
 
     @Value("${application.file.upload.photos-output-path}")
-    private final String fileUploadPath;
+    String fileUploadPath;
 
     public String saveFile(
             @NotNull MultipartFile sourceFile,

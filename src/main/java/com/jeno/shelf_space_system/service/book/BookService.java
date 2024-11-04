@@ -10,7 +10,7 @@ import com.jeno.shelf_space_system.model.book.BookTransactionHistory;
 import com.jeno.shelf_space_system.model.user.User;
 import com.jeno.shelf_space_system.repository.BookRepository;
 import com.jeno.shelf_space_system.repository.BookTransactionHistoryRepository;
-import com.jeno.shelf_space_system.service.file.FilestorageService;
+import com.jeno.shelf_space_system.service.file.FileStorageService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final BookTransactionHistoryRepository bookTransactionHistoryRepository;
-    private final FilestorageService filestorageService;
+    private final FileStorageService filestorageService;
 
     public Integer saveBook(@Valid BookRequest request, Authentication connectedUser) {
         User user = ((User) connectedUser.getPrincipal());

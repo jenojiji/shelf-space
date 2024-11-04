@@ -29,7 +29,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.saveBook(request, connectedUser));
     }
 
-    @GetMapping("{book_id}")
+    @GetMapping("/{book_id}")
     public ResponseEntity<BookResponse> getBookById(@PathVariable Integer bookId) {
         return ResponseEntity.ok(bookService.findByBookId(bookId));
     }
@@ -62,7 +62,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.findAllBorrowedBooks(page, size, connectedUser));
     }
 
-    @GetMapping("/borrowed")
+    @GetMapping("/returned")
     public ResponseEntity<PageResponse<BorrowedBookResponse>> getAllReturnedBooks(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size,
@@ -79,7 +79,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.updateShareableStatus(bookId, connectedUser));
     }
 
-    @PatchMapping("/shareable/{book_id}")
+    @PatchMapping("/archived/{book_id}")
     public ResponseEntity<Integer> updateArchivedStatus(
             @PathVariable("book-id") Integer bookId,
             Authentication connectedUser
@@ -112,13 +112,13 @@ public class BookController {
     }
 
 
-    @PostMapping(value = "/cover/book/{book_id}",consumes = "multipart/form-data")
+    @PostMapping(value = "/cover/book/{book_id}", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadBookCoverPicture(
             @PathVariable("book_id") Integer bookId,
-            @RequestPart("file")MultipartFile file,
+            @RequestPart("file") MultipartFile file,
             Authentication connectedUser
-            ){
-        bookService.uploadBookCoverPicture(file,connectedUser,bookId);
+    ) {
+        bookService.uploadBookCoverPicture(file, connectedUser, bookId);
         return ResponseEntity.accepted().build();
 
     }
