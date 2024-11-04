@@ -12,3 +12,34 @@ spring:
       hibernate:
         formate-sql: true
     database: postgresql
+  mail:
+    host: localhost
+    port: 1025
+    username: jeno
+    password: jeno
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+        auth: true
+        starttls:
+          enabled: true
+        connectiontimeout: 5000
+        timeout: 3000
+        writetimeout: 5000
+  server:
+    port: 8088
+
+
+application:
+  security:
+    jwt:
+      secret-key: iF0LkfwR/pkA36x7Y7Q/jF6+PDURj5rpvvDGXnW+c4CG4hE=
+      expiration: 828144
+  mailing:
+    frontend:
+      activation-url: http://localhost:4200/activate-account
+
+  file:
+    upload:
+      photos-output-path: ./uploads
